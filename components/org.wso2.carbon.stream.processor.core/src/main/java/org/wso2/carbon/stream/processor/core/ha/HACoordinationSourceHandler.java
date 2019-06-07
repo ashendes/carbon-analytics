@@ -224,7 +224,6 @@ public class HACoordinationSourceHandler extends SourceHandler {
     }
 
     private void sendEventsToPassiveNode(Event[] events, String[] transportSyncProperties) {
-        log.error("isWaitingForPassiveNode? " + isWaitingForPassiveNode.get());
         if (!isWaitingForPassiveNode.get() || lastConnRefusedTimestamp.get() + 5000 < System.currentTimeMillis()) {
             isWaitingForPassiveNode.set(false);
             GenericKeyedObjectPool objectPool = EventSyncConnectionPoolManager.getConnectionPool();

@@ -84,7 +84,7 @@ public class HAEventListener extends MemberEventListener {
                                         log.warn("Passive node properties Map is null. Waiting " +
                                                 haManager.getDeploymentConfig().
                                                         getPassiveNodeDetailsRetrySleepTimeMillis()
-                                                + " milliseconds till it available");
+                                                + " milliseconds till it is available");
                                         Thread.sleep(haManager.getDeploymentConfig().
                                                 getPassiveNodeDetailsRetrySleepTimeMillis());
                                     }
