@@ -24,7 +24,7 @@
     <groupId>org.wso2.carbon.analytics</groupId>
     <artifactId>org.wso2.carbon.analytics.parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.22</version>
+    <version>2.1.22.1-SNAPSHOT</version>
     <name>WSO2 Carbon Analytics - Parent</name>
     <modules>
         <module>components/org.wso2.carbon.stream.processor.common</module>
@@ -1813,5 +1813,5 @@
         <org.testcontainers.version>1.8.0</org.testcontainers.version>
 
         <xerces.version>2.12.0</xerces.version>
-    </properties>
+    <project.scm.id>wso2-scm-server</project.scm.id></properties>
 <scm><url>https://github.com/wso2-support/carbon-analytics</url><developerConnection>scm:git:https://github.com/wso2-support/carbon-analytics</developerConnection><connection>scm:git:https://github.com/wso2-support/carbon-analytics</connection></scm></project>
