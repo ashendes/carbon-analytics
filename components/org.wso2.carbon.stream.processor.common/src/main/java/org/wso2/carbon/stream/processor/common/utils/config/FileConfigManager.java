@@ -27,7 +27,11 @@ import org.wso2.siddhi.core.util.config.ConfigManager;
 import org.wso2.siddhi.core.util.config.ConfigReader;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static org.wso2.carbon.stream.processor.common.utils.SPConstants.DATASOURCES_ROOT_ELEMENT;
+import static org.wso2.carbon.stream.processor.common.utils.SPConstants.DATASOURCE_NAMESPACE;
 
 /**
  * Siddhi File Configuration Manager.
@@ -43,6 +47,8 @@ public class FileConfigManager implements ConfigManager {
 
     @Override
     public ConfigReader generateConfigReader(String namespace, String name) {
+        List datasourceConfigs;
+        Map datasourceConnectionProperties;
         if (configProvider != null) {
             try {
                 RootConfiguration rootConfiguration = configProvider.getConfigurationObject(RootConfiguration.class);
@@ -55,6 +61,21 @@ public class FileConfigManager implements ConfigManager {
                                 && null != childConfiguration.getProperties()) {
                             return new FileConfigReader(childConfiguration.getProperties());
                         }
+                    }
+                } else if (namespace.equalsIgnoreCase(DATASOURCES_ROOT_ELEMENT)) {
+                    try {
+                        datasourceConfigs = (List) ((HashMap) configProvider
+                                .getConfigurationObject(DATASOURCES_ROOT_ELEMENT))
+                                .get(DATASOURCE_NAMESPACE);
+                        for (Object datasourceConfig : datasourceConfigs) {
+                            if (((HashMap) datasourceConfig).get("name").equals(name)) {
+                                datasourceConnectionProperties = (Map) ((HashMap) ((HashMap<?, ?>) datasourceConfig).
+                                        get("definition")).get("configuration");
+                                return new FileConfigReader(datasourceConnectionProperties);
+                            }
+                        }
+                    } catch (ConfigurationException e) {
+                        LOGGER.error("Error occurred while reading the datasource configurations from deployment.yaml", e);
                     }
                 }
             } catch (ConfigurationException e) {
@@ -136,5 +157,9 @@ public class FileConfigManager implements ConfigManager {
             LOGGER.debug("Could not find a matching configuration for property name: " + name + "");
         }
         return property;
+    }
+
+    public ConfigProvider getConfigProvider() {
+        return configProvider;
     }
 }
