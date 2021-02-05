@@ -38,6 +38,7 @@ import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppAlready
 import org.wso2.carbon.stream.processor.core.internal.exception.SiddhiAppDeploymentException;
 import org.wso2.carbon.stream.processor.core.internal.util.SiddhiAppProcessorConstants;
 import org.wso2.msf4j.MicroservicesServer;
+import org.wso2.siddhi.core.exception.SiddhiAppCreationException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -326,12 +327,46 @@ public class StreamProcessorDeployer implements Deployer {
 
         if (StreamProcessorDataHolder.getInstance().getRuntimeMode().equals(SiddhiAppProcessorConstants.
                 RuntimeMode.SERVER)) {
-            try {
-                deploySiddhiQLFile(artifact.getFile());
-            } catch (Throwable e) {
-                log.error(e.getMessage(), e);
-                //throw new CarbonDeploymentException(e.getMessage(), e);
+            int retryCount = 0;
+            boolean extensionUnavailabilityErrorRecieved = false;
+            while (retryCount != SiddhiAppProcessorConstants.SIDDHI_APP_REDEPLOY_RETRY_COUNT) {
+                try {
+                    deploySiddhiQLFile(artifact.getFile());
+                    extensionUnavailabilityErrorRecieved = false;
+                    break;
+                } catch (Throwable e) {
+                    if (e instanceof SiddhiAppDeploymentException && e.getCause() instanceof
+                            SiddhiAppCreationException) {
+                        if (e.getCause().getMessage().contains("is neither a function extension nor an aggregated " +
+                                "attribute extension") ||
+                                e.getCause().getMessage().contains("No extension exist for")) {
+                            extensionUnavailabilityErrorRecieved = true;
+                            try {
+                                log.warn("Dependencies are not satisfied to deploy siddhi file " +
+                                        artifact.getFile().getName() + " due to " + e.getCause().getMessage() +
+                                        ".Please check the required dependencies exist.Redeploy will retry in " +
+                                        SiddhiAppProcessorConstants.SIDDHI_APP_REDEPLOY_SLEEP_TIMEOUT +
+                                        " milliseconds.");
+                                StreamProcessorDataHolder.getStreamProcessorService().
+                                        undeploySiddhiApp(getFileNameWithoutExtenson(artifact.getName()));
+                                Thread.sleep(SiddhiAppProcessorConstants.SIDDHI_APP_REDEPLOY_SLEEP_TIMEOUT);
+                            } catch (InterruptedException e1) {
+                                log.error("Error while waiting for dependencies to be statisfied " + e1.getMessage());
+                            }
+                        }
+                    } else {
+                        extensionUnavailabilityErrorRecieved = false;
+                        log.error(e.getMessage(), e);
+                        break;
+                    }
+                }
+                retryCount ++;
             }
+            if (extensionUnavailabilityErrorRecieved) {
+                log.error("Could not deploy siddhi file " + artifact.getFile().getName() + " after retrying for " +
+                        SiddhiAppProcessorConstants.SIDDHI_APP_REDEPLOY_RETRY_COUNT + " times.");
+            }
+
         }
         broadcastDeploy();
         return artifact.getFile().getName();
