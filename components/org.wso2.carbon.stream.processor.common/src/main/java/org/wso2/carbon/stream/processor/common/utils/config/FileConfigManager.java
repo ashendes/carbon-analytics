@@ -75,7 +75,8 @@ public class FileConfigManager implements ConfigManager {
                             }
                         }
                     } catch (ConfigurationException e) {
-                        LOGGER.error("Error occurred while reading the datasource configurations from deployment.yaml", e);
+                        LOGGER.error("Error occurred while reading the datasource configurations " +
+                                "from deployment.yaml", e);
                     }
                 }
             } catch (ConfigurationException e) {
