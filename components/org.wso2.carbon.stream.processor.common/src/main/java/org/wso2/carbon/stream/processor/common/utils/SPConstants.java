@@ -25,6 +25,9 @@ public class SPConstants {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String COOKIE_HEADER = "Cookie";
 
+    public static final String DATASOURCES_ROOT_ELEMENT = "wso2.datasources";
+    public static final String DATASOURCE_NAMESPACE = "dataSources";
+
     private SPConstants() {
     }
 }
