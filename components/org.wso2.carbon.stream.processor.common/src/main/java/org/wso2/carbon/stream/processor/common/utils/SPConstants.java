@@ -27,7 +27,6 @@ public class SPConstants {
 
     public static final String DATASOURCES_ROOT_ELEMENT = "wso2.datasources";
     public static final String DATASOURCE_NAMESPACE = "dataSources";
-
     private SPConstants() {
     }
 }
