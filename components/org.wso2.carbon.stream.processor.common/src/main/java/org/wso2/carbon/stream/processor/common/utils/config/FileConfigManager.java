@@ -62,7 +62,8 @@ public class FileConfigManager implements ConfigManager {
                             return new FileConfigReader(childConfiguration.getProperties());
                         }
                     }
-                } else if (namespace.equalsIgnoreCase(DATASOURCES_ROOT_ELEMENT)) {
+                }
+                if (namespace.equalsIgnoreCase(DATASOURCES_ROOT_ELEMENT)) {
                     try {
                         datasourceConfigs = (List) ((HashMap) configProvider
                                 .getConfigurationObject(DATASOURCES_ROOT_ELEMENT))
